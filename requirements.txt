@@ -8,5 +8,5 @@ opencv-python-headless
 decord
 accelerate
 bitsandbytes
-tokenizers==0.14.1
+tokenizers>=0.14.1
 sentencepiece

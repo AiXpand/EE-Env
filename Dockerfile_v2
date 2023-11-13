@@ -1,27 +1,28 @@
+# Use a specific, smaller base image if possible
 FROM pytorch/pytorch
 
-RUN conda install -c conda-forge "transformers>=4.34.0"
-RUN conda install seaborn pandas shapely scikit-learn scikit-image dropbox pymssql h5py unidecode
-RUN conda install -c conda-forge "ffmpeg>=5"
-
-
+# Set a working directory
 WORKDIR /exe_eng_base
-COPY . /exe_eng_base
 
-# after copy run requirements
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+# Copy the requirements of your project into the container
+COPY requirements.txt /exe_eng_base/
 
-# Set a default value for the TZ environment variable
+# Combine conda and pip installations into a single RUN command to reduce layers.
+# Also clean up conda caches to reduce image size.
+RUN conda install -c conda-forge "transformers>=4.34.0" seaborn pandas shapely scikit-learn scikit-image dropbox pymssql h5py unidecode "ffmpeg>=5" \
+    && pip install --no-cache-dir --upgrade -r requirements.txt \
+    && conda clean -afy
+
+# Set timezone environment variable
 ENV TZ=Europe/Bucharest
 
-# install ip-utils for debugging connection
-RUN apt-get update && apt-get install -y iputils-ping
-# Install tzdata if it's not available in your base image. 
-RUN apt-get update && apt-get install -y tzdata nano vim
-# Use the TZ variable to set the timezone
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Combine apt-get commands into one layer and clean up afterwards to reduce image size
+RUN apt-get update && apt-get install -y iputils-ping tzdata nano vim \
+    # Set the timezone based on the TZ environment variable
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    # Clean up apt cache to reduce image size
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
-# set a generic env variable 
+# Set generic environment variables
 ENV AIXP_DOCKER Yes
-ENV AIXP_ENV v0.8-2.1
+ENV AIXP_ENV v0.9-2.1
