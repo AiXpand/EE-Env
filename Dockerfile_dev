@@ -16,7 +16,14 @@ RUN conda install -c conda-forge "transformers>=4.34.0" jupyter seaborn pandas s
 ENV TZ=Europe/Bucharest
 
 # Combine apt-get commands into one layer and clean up afterwards to reduce image size
-RUN apt-get update && apt-get install -y iputils-ping tzdata nano vim \
+RUN apt-get update && apt-get install -y \
+    iputils-ping \
+    tzdata \
+    nano \
+    vim \
+    curl \
+    git \
+    htop \
     # Set the timezone based on the TZ environment variable
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     # Clean up apt cache to reduce image size
