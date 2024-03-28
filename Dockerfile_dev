@@ -8,7 +8,7 @@ COPY requirements.txt /exe_eng_base/
 
 # Combine conda and pip installations into a single RUN command to reduce layers.
 # Also clean up conda caches to reduce image size.
-RUN conda install -c conda-forge "transformers>=4.34.0" jupyter seaborn pandas shapely scikit-learn scikit-image dropbox pymssql h5py unidecode "ffmpeg>=5" \
+RUN conda install -c conda-forge "transformers>=4.38.0" "ffmpeg>=5" "pyarrow>=15" jupyter seaborn pandas shapely scikit-learn scikit-image dropbox pymssql h5py unidecode \
     && pip install --no-cache-dir --upgrade -r requirements.txt \
     && conda clean -afy
 
@@ -32,4 +32,4 @@ RUN apt-get update && apt-get install -y \
 
 # Set generic environment variables
 ENV AIXP_DOCKER Yes
-ENV AIXP_ENV v1.1-2.1
+ENV AIXP_ENV v1.3
